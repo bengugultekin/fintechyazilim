@@ -20,7 +20,12 @@
                 :per-page="perPage"
                 :filter-included-fields="['name', 'capital', 'region']"
                 >
-
+                <template #cell(index)="data">
+                    {{data.index + 1 }}
+                </template>
+                <template #cell(imgflag)="data">
+                    <img :src="data.item.flag" width="40" height="30"/>
+                </template>
                 </b-table>
             </b-col>
         </b-row>
@@ -28,8 +33,33 @@
 </template>
 
 <script>
+
+import axios from 'axios';
     export default {
-        
+        data() {
+            return {
+                filter: "",
+                items:[],
+                perPage: 10,
+                currentPage: 1,
+                fields: ['index', 'name', 'capital', 'region', {key:'imgflag', label:'Flag'}],
+                rows: 0
+            }
+        },
+        // Fetches posts when the components is created.
+        created() {
+            axios.get(`https://restcountries.eu/rest/v2/all`)
+            .then(
+                response => {
+
+                    this.items = response.data;
+                    this.fields = ['index', 'name', 'capital', 'region', {key:'imgflag', label:'Flag'}];
+                    this.rows = response.data.lenght
+                })
+                .catch(e => {
+                    this.errors.push(e)
+                })
+        }
     }
 </script>
 
